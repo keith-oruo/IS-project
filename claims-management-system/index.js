@@ -1,5 +1,6 @@
 // claims_api_backend/index.js
-
+const authRoutes = require('./auth');
+app.use('/api/auth', authRoutes);
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
