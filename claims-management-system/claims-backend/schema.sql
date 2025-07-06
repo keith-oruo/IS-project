@@ -15,6 +15,7 @@ CREATE TABLE hospital_staff (
     full_name TEXT NOT NULL,
     email TEXT NOT NULL,
     role TEXT NOT NULL,
+    password_hash TEXT,
     hospital_id INTEGER REFERENCES hospitals(hospital_id) ON DELETE SET NULL
 );
 

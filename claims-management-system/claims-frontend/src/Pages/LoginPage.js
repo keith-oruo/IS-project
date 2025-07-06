@@ -4,17 +4,13 @@ import AuthForm from 'src/Components/AuthForm';
 
 function LoginPage() {
   const navigate = useNavigate();
-
-  const handleLogin = () => {
-    navigate('/dashboard');
-  };
+  const handleLogin = () => navigate('/dashboard');
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="container mt-5">
+      <h1 className="mb-4">Claims Management System</h1>
+      <h2>Staff Login Portal</h2>
       <AuthForm onLogin={handleLogin} />
     </div>
   );
 }
-
-export default LoginPage;
