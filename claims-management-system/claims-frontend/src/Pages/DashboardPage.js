@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
-import ClaimCard from '../components/ClaimCard';
+import ClaimCard from '../Components/ClaimCard';
 import Navbar from '../Components/NavBar';
 import { Link } from 'react-router-dom';
 
@@ -19,9 +19,12 @@ function DashboardPage() {
     if (storedRole === 'Patient') {
       api.get(`/claims/status/${storedId}`).then(res => setClaims(res.data));
       api.get(`/invoices/patient/${storedId}`).then(res => setInvoices(res.data));
+    } else if (storedRole === 'SystemAdmin') {
+      api.get('/admin/claims').then(res => setClaims(res.data));
     } else {
-      api.get('/claims/status/1').then(res => setClaims(res.data)); // Replace 1 with actual staff/admin ID if needed
-      api.get('/invoices/patient/1').then(res => setInvoices(res.data)); // Placeholder if staff needs invoice access
+      // For HospitalStaff and InsurerStaff: fetch their submitted/related claims
+      api.get(`/claims/status/301`).then(res => setClaims(res.data));
+      api.get(`/invoices/patient/301`).then(res => setInvoices(res.data));
     }
   }, []);
 

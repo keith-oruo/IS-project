@@ -1,32 +1,31 @@
 import React, { useState } from 'react';
-import api from '../api';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
+import api from '../api';
 
 function AuthForm() {
   const [form, setForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
+  const handleLogin = async () => {
     try {
       const res = await api.post('/auth/login', form);
-      const { token, role, staffId, patientId, adminId } = res.data;
+      const { token, role, userId } = res.data;
 
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
-      localStorage.setItem('userId', staffId || patientId || adminId);
+      localStorage.setItem('userId', userId);
 
-      if (role === 'SystemAdmin') {
-        navigate('/profile');
-      } else {
-        navigate('/dashboard');
-      }
+      // Redirect based on role
+      if (role === 'SystemAdmin') navigate('/profile');
+      else navigate('/dashboard');
     } catch (err) {
-      alert('Login failed: ' + (err.response?.data?.error || 'Unknown error'));
+      const message = err.response?.data?.error || 'Login failed';
+      setError(message);
     }
   };
 
@@ -38,17 +37,19 @@ function AuthForm() {
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-5">
+      <h2>Login</h2>
+      {error && <div className="alert alert-danger">{error}</div>}
       <div className="mb-3">
-        <label>Email address</label>
-        <input type="email" name="email" className="form-control" onChange={handleChange} />
+        <label className="form-label">Email</label>
+        <input name="email" className="form-control" onChange={handleChange} placeholder="Enter email" />
       </div>
       <div className="mb-3">
-        <label>Password</label>
-        <input type="password" name="password" className="form-control" onChange={handleChange} />
+        <label className="form-label">Password</label>
+        <input name="password" type="password" className="form-control" onChange={handleChange} placeholder="Enter password" />
       </div>
-      <button className="btn btn-primary me-2" onClick={handleSubmit}>Login</button>
-      <button className="btn btn-secondary" onClick={handleLogout}>Logout</button>
+      <button className="btn btn-primary" onClick={handleLogin}>Login</button>
+      <button className="btn btn-secondary ms-2" onClick={handleLogout}>Logout</button>
     </div>
   );
 }
