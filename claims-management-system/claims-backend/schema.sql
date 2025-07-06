@@ -124,7 +124,7 @@ INSERT INTO insurers (insurer_id, name, contact_email) VALUES
 -- Insert hospital staff (Doctor)
 INSERT INTO hospital_staff (staff_id, full_name, email, password_hash, role, hospital_id)
 VALUES (101, 'Alice Doctor', 'alice@hospital.com',
-'$2a$10$KtAiZ8Euog1UBFzN44NJleZuQmuPejMfS/91FQ4FTbUQef5XZRt7e', 'Doctor', 100);
+'$2b$10$pTMNvejJD2PKUd9Xci1R0eORFZ8syjOP5J//SkeNZIjFOkCstu6BS', 'Doctor', 100);
 
 -- Insert insurer staff (Claims Officer)
 INSERT INTO insurer_staff (staff_id, full_name, email, password_hash, role, insurer_id)

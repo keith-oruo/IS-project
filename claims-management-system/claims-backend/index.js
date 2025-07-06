@@ -8,7 +8,7 @@ const authRoutes = require('./auth');
 const verifyToken = require('./middleware/authMiddleware');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -21,6 +21,11 @@ app.post('/api/claims', verifyToken, async (req, res) => {
   if (req.user.role !== 'HospitalStaff') return res.status(403).json({ error: 'Unauthorized' });
 
   const { patientId, submittedByStaffId, treatmentDetails } = req.body;
+
+  if (req.user.userId != submittedByStaffId) {
+    return res.status(403).json({ error: 'Staff ID mismatch with token' });
+  }
+
   try {
     const result = await pool.query(
       `INSERT INTO claims (patient_id, submitted_by_staff_id, treatment_details, status)
@@ -35,14 +40,15 @@ app.post('/api/claims', verifyToken, async (req, res) => {
 
 // Track claim status (Patient only)
 app.get('/api/claims/status/:patientId', verifyToken, async (req, res) => {
-  if (req.user.role !== 'Patient') return res.status(403).json({ error: 'Unauthorized' });
+  if (req.user.role !== 'Patient' || req.user.userId != req.params.patientId) {
+    return res.status(403).json({ error: 'Unauthorized' });
+  }
 
-  const { patientId } = req.params;
   try {
     const result = await pool.query(
       `SELECT claim_id, status, submission_date, approval_date, rejection_reason
        FROM claims WHERE patient_id = $1`,
-      [patientId]
+      [req.params.patientId]
     );
     res.status(200).json(result.rows);
   } catch (err) {
@@ -70,6 +76,7 @@ app.post('/api/claims/:claimId/messages', verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 // Get messages for a specific claim (All roles)
 app.get('/api/claims/:claimId/messages', verifyToken, async (req, res) => {
   const { claimId } = req.params;
@@ -91,11 +98,17 @@ app.get('/api/claims/:claimId/messages', verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 // Generate invoice (Hospital Staff only)
 app.post('/api/invoices', verifyToken, async (req, res) => {
   if (req.user.role !== 'HospitalStaff') return res.status(403).json({ error: 'Unauthorized' });
 
   const { claimId, generatedByStaffId, amount } = req.body;
+
+  if (req.user.userId != generatedByStaffId) {
+    return res.status(403).json({ error: 'Staff ID mismatch with token' });
+  }
+
   try {
     const result = await pool.query(
       `INSERT INTO invoices (claim_id, generated_by_staff_id, amount)

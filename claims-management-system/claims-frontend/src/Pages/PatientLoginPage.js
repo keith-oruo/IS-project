@@ -10,8 +10,9 @@ function PatientLoginPage() {
     <div className="container mt-5">
       <h1 className="mb-4">Claims Management System</h1>
       <h2>Patient Login Portal</h2>
-      <AuthForm onLogin={handleLogin} userType="Patient" />
+      <AuthForm onLogin={handleLogin} role="Patient" />
     </div>
   );
 }
+
 export default PatientLoginPage;

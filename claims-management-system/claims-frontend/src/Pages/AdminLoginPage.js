@@ -9,8 +9,8 @@ function AdminLoginPage() {
   return (
     <div className="container mt-5">
       <h1 className="mb-4">Claims Management System</h1>
-      <h2>System Administrator Login</h2>
-      <AuthForm onLogin={handleLogin} userType="SystemAdmin" />
+      <h2>System Admin Login Portal</h2>
+      <AuthForm onLogin={handleLogin} role="SystemAdmin" />
     </div>
   );
 }

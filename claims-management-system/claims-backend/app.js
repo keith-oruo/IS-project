@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+require('dotenv').config();
 
 function App() {
   const [form, setForm] = useState({ email: '', password: '' });

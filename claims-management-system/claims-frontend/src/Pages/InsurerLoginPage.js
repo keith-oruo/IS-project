@@ -10,7 +10,7 @@ function InsurerLoginPage() {
     <div className="container mt-5">
       <h1 className="mb-4">Claims Management System</h1>
       <h2>Insurer Staff Login Portal</h2>
-      <AuthForm onLogin={handleLogin} userType="InsurerStaff" />
+      <AuthForm onLogin={handleLogin} role="InsurerStaff" />
     </div>
   );
 }

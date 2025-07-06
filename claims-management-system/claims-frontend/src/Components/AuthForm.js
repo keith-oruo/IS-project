@@ -1,56 +1,58 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
-function AuthForm() {
+function AuthForm({ onLogin }) {
   const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleLogin = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+
     try {
-      const res = await api.post('/auth/login', form);
-      const { token, role, userId } = res.data;
+      const response = await api.post('/auth/login', form);
+      const { token, role } = response.data;
 
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
-      localStorage.setItem('userId', userId);
 
-      // Redirect based on role
-      if (role === 'SystemAdmin') navigate('/profile');
-      else navigate('/dashboard');
+      onLogin();
     } catch (err) {
-      const message = err.response?.data?.error || 'Login failed';
-      setError(message);
+      setError(err.response?.data?.error || 'Login failed');
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('userId');
-    navigate('/');
-  };
-
   return (
-    <div className="container mt-5">
-      <h2>Login</h2>
-      {error && <div className="alert alert-danger">{error}</div>}
+    <form onSubmit={handleSubmit}>
       <div className="mb-3">
-        <label className="form-label">Email</label>
-        <input name="email" className="form-control" onChange={handleChange} placeholder="Enter email" />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          className="form-control"
+          required
+        />
       </div>
       <div className="mb-3">
-        <label className="form-label">Password</label>
-        <input name="password" type="password" className="form-control" onChange={handleChange} placeholder="Enter password" />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+          className="form-control"
+          required
+        />
       </div>
-      <button className="btn btn-primary" onClick={handleLogin}>Login</button>
-      <button className="btn btn-secondary ms-2" onClick={handleLogout}>Logout</button>
-    </div>
+      {error && <div className="text-danger mb-2">{error}</div>}
+      <button type="submit" className="btn btn-primary">Login</button>
+    </form>
   );
 }
 
