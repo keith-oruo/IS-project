@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api';
 
-function AuthForm({ onLogin }) {
+function AuthForm({ onLogin, role }) {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState(null);
 
@@ -14,11 +14,12 @@ function AuthForm({ onLogin }) {
     setError(null);
 
     try {
-      const response = await api.post('/auth/login', form);
-      const { token, role } = response.data;
+      const response = await api.post('/auth/login', { ...form, role });
+      const { token, role: userRole, userId } = response.data;
 
       localStorage.setItem('token', token);
-      localStorage.setItem('role', role);
+      localStorage.setItem('role', userRole);
+      localStorage.setItem('userId', userId);
 
       onLogin();
     } catch (err) {

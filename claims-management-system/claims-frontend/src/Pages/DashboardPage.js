@@ -17,14 +17,16 @@ function DashboardPage() {
     setUserId(storedId);
 
     if (storedRole === 'Patient') {
-      api.get(`/claims/status/${storedId}`).then(res => setClaims(res.data));
-      api.get(`/invoices/patient/${storedId}`).then(res => setInvoices(res.data));
+      api.get(`claims/status/${storedId}`).then(res => setClaims(res.data));
+      api.get(`invoices/patient/${storedId}`).then(res => setInvoices(res.data));
     } else if (storedRole === 'SystemAdmin') {
-      api.get('/admin/claims').then(res => setClaims(res.data));
-    } else {
-      // For HospitalStaff and InsurerStaff: fetch their submitted/related claims
-      api.get(`/claims/status/301`).then(res => setClaims(res.data));
-      api.get(`/invoices/patient/301`).then(res => setInvoices(res.data));
+      api.get('admin/claims').then(res => setClaims(res.data));
+    } else if (storedRole === 'HospitalStaff') {
+      // Fetch claims submitted by this staff member
+      api.get(`claims/staff/${storedId}`).then(res => setClaims(res.data));
+    } else if (storedRole === 'InsurerStaff') {
+      // Fetch claims assigned to this insurer
+      api.get(`claims/insurer/${storedId}`).then(res => setClaims(res.data));
     }
   }, []);
 
