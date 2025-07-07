@@ -30,8 +30,9 @@ router.get('/', verifyToken, async (req, res) => {
 
 // InsurerStaff: Edit invoice amount (PATCH /api/invoices/:invoiceId)
 router.patch('/:invoiceId', verifyToken, async (req, res) => {
-  if (req.user.role !== 'InsurerStaff') {
-    return res.status(403).json({ error: 'Only insurer staff can edit invoices.' });
+  // Allow both InsurerStaff and SystemAdmin to edit invoices
+  if (req.user.role !== 'InsurerStaff' && req.user.role !== 'SystemAdmin') {
+    return res.status(403).json({ error: 'Only insurer staff or system admin can edit invoices.' });
   }
   const { invoiceId } = req.params;
   const { amount } = req.body;

@@ -66,6 +66,13 @@ function DashboardPage() {
       });
     } else if (storedRole === 'SystemAdmin') {
       api.get('/admin/claims').then(res => setClaims(res.data)).catch(() => setClaims([]));
+      api.get('/invoices').then(res => {
+        setInvoices(res.data);
+        console.log('Invoices for admin:', res.data);
+      }).catch(err => {
+        setInvoices([]);
+        console.error('Error fetching invoices for admin:', err.response?.data || err.message, err.config);
+      });
     } else if (storedRole === 'HospitalStaff') {
       // Fetch claims submitted by this staff member
       api.get(`/claims/staff/${storedId}`).then(res => setClaims(res.data)).catch(() => setClaims([]));
@@ -165,6 +172,39 @@ function DashboardPage() {
               )}
             </div>
             <h2 className="mt-5">Invoices (All Approved)</h2>
+            <div className="row">
+              {invoices.length === 0 ? (
+                <p>No invoices found.</p>
+              ) : (
+                invoices.map(inv => (
+                  <div className="col-md-4 mb-3" key={inv.invoice_id}>
+                    <div className="card p-3">
+                      <h5>Invoice ID: {inv.invoice_id}</h5>
+                      <p>Claim ID: {inv.claim_id}</p>
+                      <p>Amount: {inv.amount}</p>
+                      <button className="btn btn-warning btn-sm mt-2" onClick={() => handleEditInvoice(inv)}>Edit</button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </>
+        )}
+        {role === 'SystemAdmin' && (
+          <>
+            <h2>All Claims</h2>
+            <div className="row">
+              {claims.length === 0 ? (
+                <p>No claims found.</p>
+              ) : (
+                claims.map(claim => (
+                  <div className="col-md-4 mb-3" key={claim.claim_id}>
+                    <ClaimCard claim={claim} />
+                  </div>
+                ))
+              )}
+            </div>
+            <h2 className="mt-5">All Invoices (Approved Claims Only)</h2>
             <div className="row">
               {invoices.length === 0 ? (
                 <p>No invoices found.</p>

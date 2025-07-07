@@ -93,6 +93,15 @@ async function seedDatabase() {
       (603, 504, 'InsurerStaff', 202, 'Claim approved.');
     `);
 
+    // Insert audit logs (claim_edit_logs) for testing
+    await client.query(`
+      INSERT INTO claim_edit_logs (edit_id, claim_id, editor_role, editor_id, edit_timestamp, edit_details) VALUES
+      (801, 501, 'SystemAdmin', 401, NOW() - INTERVAL '2 days', 'Changed claim status from Pending to Approved'),
+      (802, 502, 'SystemAdmin', 401, NOW() - INTERVAL '1 day', 'Edited rejection reason'),
+      (803, 504, 'SystemAdmin', 401, NOW() - INTERVAL '3 hours', 'Updated treatment details'),
+      (804, 506, 'SystemAdmin', 401, NOW() - INTERVAL '1 hour', 'Corrected patient ID');
+    `);
+
     await client.query('COMMIT');
     console.log('Database seeded successfully!');
   } catch (err) {

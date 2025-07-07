@@ -2,9 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../Components/AuthForm';
 
+
 function AdminLoginPage() {
   const navigate = useNavigate();
-  const handleLogin = () => navigate('/profile');
+  // Redirect to dashboard so admin sees invoices/claims
+  const handleLogin = () => navigate('/dashboard');
 
   return (
     <div className="container mt-5">
