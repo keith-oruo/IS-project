@@ -165,7 +165,7 @@ function DashboardPage() {
                         </>
                       )}
                       {claim.status === 'Rejected' && <p>Reason: {claim.rejection_reason}</p>}
-                      <Link to={`/claim/${claim.claim_id}`}>View Details</Link>
+                      <Link to={`/claims/${claim.claim_id}`}>View Details</Link>
                     </div>
                   </div>
                 ))
