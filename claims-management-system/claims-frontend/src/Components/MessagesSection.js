@@ -3,8 +3,11 @@ import { useParams } from 'react-router-dom';
 import api from '../api';
 import Navbar from '../Components/NavBar';
 
-function ClaimDetailPage() {
-  const { id: claimId } = useParams();
+// Accept claimId as a prop, or fallback to useParams if not provided
+function MessagesSection(props) {
+  // Always call useParams at the top
+  const params = useParams();
+  const claimId = props.claimId || params.id;
   const [claim, setClaim] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -12,8 +15,8 @@ function ClaimDetailPage() {
   const userId = localStorage.getItem('userId');
 
   useEffect(() => {
-    api.get(`/claims/status/${claimId}`) 
-      .then(res => setClaim(res.data[0]))
+    api.get(`/claims/view/${claimId}`)
+      .then(res => setClaim(res.data))
       .catch(err => console.error(err));
 
     api.get(`/claims/${claimId}/messages`)
@@ -87,4 +90,4 @@ function ClaimDetailPage() {
   );
 }
 
-export default ClaimDetailPage;
+export default MessagesSection;

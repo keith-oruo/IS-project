@@ -12,26 +12,20 @@ function AuthForm({ onLogin, role }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    console.log('Submitting login form with data:', { ...form, role });
-
     try {
-      const response = await api.post('auth/login', { ...form, role });
-      console.log('Login API call successful:', response.data);
+      const response = await api.post('/auth/login', { ...form, role });
       const { token, role: userRole, userId } = response.data;
-
       localStorage.setItem('token', token);
       localStorage.setItem('role', userRole);
       localStorage.setItem('userId', userId);
-
-      onLogin();
+      if (onLogin) onLogin();
     } catch (err) {
-      console.error('Login API call failed:', err.toJSON ? err.toJSON() : err);
-      setError(err.response?.data?.error || 'An unexpected error occurred.');
+      setError(err.response?.data?.error || 'Login failed');
     }
   };
 
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <div className="mb-3">
         <input
           type="email"
@@ -55,7 +49,7 @@ function AuthForm({ onLogin, role }) {
         />
       </div>
       {error && <div className="text-danger mb-2">{error}</div>}
-      <button type="button" className="btn btn-primary" onClick={handleSubmit}>Login</button>
+      <button type="submit" className="btn btn-primary">Login</button>
     </form>
   );
 }

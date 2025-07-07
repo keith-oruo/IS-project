@@ -7,14 +7,21 @@ function ClaimDetailPage() {
   const { id } = useParams();
   const [claim, setClaim] = useState(null);
 
+
+  const [error, setError] = useState(null);
   useEffect(() => {
-    api.get(`/claims/status/1`) // Replace with single claim endpoint when available
+    api.get(`/claims/view/${id}`)
       .then(res => {
-        const found = res.data.find(c => c.claim_id === parseInt(id));
-        setClaim(found);
+        setClaim(res.data);
+        setError(null);
+      })
+      .catch(err => {
+        setError(err.response?.data?.error || 'Error loading claim');
+        setClaim(null);
       });
   }, [id]);
 
+  if (error) return <div className="alert alert-danger">{error}</div>;
   if (!claim) return <div>Loading...</div>;
 
   return (

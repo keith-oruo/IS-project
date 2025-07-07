@@ -113,4 +113,47 @@ router.get('/:claimId/messages', verifyToken, async (req, res) => {
   }
 });
 
+// Get a single claim by ID -> GET /api/claims/view/:claimId
+router.get('/view/:claimId', verifyToken, async (req, res) => {
+  try {
+    const { claimId } = req.params;
+    const { userId, role } = req.user;
+
+    const { rows } = await pool.query('SELECT * FROM claims WHERE claim_id = $1', [claimId]);
+    const claim = rows[0];
+
+    if (!claim) {
+      return res.status(404).json({ error: 'Claim not found' });
+    }
+
+    // Authorization logic
+    let isAuthorized = false;
+    if (role === 'Patient' && claim.patient_id === userId) {
+      isAuthorized = true;
+    } else if (role === 'HospitalStaff' && claim.submitted_by_staff_id === userId) {
+      isAuthorized = true;
+    } else if (role === 'InsurerStaff') {
+      const { rows: insurerRows } = await pool.query(
+        `SELECT 1 FROM patients p
+         JOIN insurer_staff istaff ON p.insurer_id = istaff.insurer_id
+         WHERE p.patient_id = $1 AND istaff.staff_id = $2`,
+        [claim.patient_id, userId]
+      );
+      if (insurerRows.length > 0) {
+        isAuthorized = true;
+      }
+    } else if (role === 'SystemAdmin') {
+      isAuthorized = true;
+    }
+
+    if (!isAuthorized) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    res.json(claim);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;

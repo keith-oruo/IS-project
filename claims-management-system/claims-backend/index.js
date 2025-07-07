@@ -22,6 +22,8 @@ app.use(bodyParser.json());
 
 // Mount the routers
 app.use('/api/auth', authRoutes);
+// Place /api/claims/view before /api/claims/:param to avoid route shadowing
+app.use('/api/claims/view', claimsRoutes);
 app.use('/api/claims', claimsRoutes);
 app.use('/api/invoices', invoicesRoutes);
 app.use('/api/admin', adminRoutes);
