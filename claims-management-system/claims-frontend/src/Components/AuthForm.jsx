@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import api from '../api';
 
+console.log('AuthForm module loaded');
+
 function AuthForm({ onLogin, role }) {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState(null);

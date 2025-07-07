@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthForm from '../Components/AuthForm';
+import AuthForm from '../Components/AuthForm.jsx';
 
 function PatientLoginPage() {
   const navigate = useNavigate();

@@ -61,13 +61,20 @@ router.get('/staff/:staffId', verifyToken, async (req, res) => {
 
 // Get claims for a specific insurer staff member -> GET /api/claims/insurer/:insurerId
 router.get('/insurer/:insurerId', verifyToken, async (req, res) => {
-  if (req.user.role !== 'InsurerStaff' || req.user.userId != req.params.insurerId) {
+  if (req.user.role !== 'InsurerStaff') {
     return res.status(403).json({ error: 'Unauthorized' });
   }
   try {
-    const result = await pool.query('SELECT * FROM claims WHERE assigned_to_insurer_id = $1', [req.params.insurerId]);
+    // Corrected query: Joins claims with patients to filter by the insurer
+    const result = await pool.query(
+      `SELECT c.* FROM claims c
+       JOIN patients p ON c.patient_id = p.patient_id
+       WHERE p.insurer_id = (SELECT insurer_id FROM insurer_staff WHERE staff_id = $1)`,
+      [req.params.insurerId]
+    );
     res.status(200).json(result.rows);
   } catch (err) {
+    console.error('Error fetching insurer claims:', err); // Added for better logging
     res.status(500).json({ error: err.message });
   }
 });
