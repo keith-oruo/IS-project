@@ -28,25 +28,17 @@ router.post('/', verifyToken, async (req, res) => {
   }
 });
 
-// Track claim status (Patient only) -> GET /api/claims/status/:patientId
+// Track claim status (Patient, HospitalStaff, InsurerStaff)
 router.get('/status/:patientId', verifyToken, async (req, res) => {
-  if (req.user.role !== 'Patient' || req.user.userId != req.params.patientId) {
-    return res.status(403).json({ error: 'Unauthorized' });
-  }
-
   try {
-    const result = await pool.query(
-      `SELECT claim_id, status, submission_date, approval_date, rejection_reason
-       FROM claims WHERE patient_id = $1`,
-      [req.params.patientId]
-    );
-    res.status(200).json(result.rows);
+    const { rows } = await pool.query('SELECT * FROM claims WHERE patient_id = $1', [req.params.patientId]);
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Get claims for a specific hospital staff member -> GET /api/claims/staff/:staffId
+// Get claims for a specific hospital staff member
 router.get('/staff/:staffId', verifyToken, async (req, res) => {
   if (req.user.role !== 'HospitalStaff' || req.user.userId != req.params.staffId) {
     return res.status(403).json({ error: 'Unauthorized' });
@@ -59,13 +51,12 @@ router.get('/staff/:staffId', verifyToken, async (req, res) => {
   }
 });
 
-// Get claims for a specific insurer staff member -> GET /api/claims/insurer/:insurerId
+// Get claims for a specific insurer
 router.get('/insurer/:insurerId', verifyToken, async (req, res) => {
   if (req.user.role !== 'InsurerStaff') {
     return res.status(403).json({ error: 'Unauthorized' });
   }
   try {
-    // Corrected query: Joins claims with patients to filter by the insurer
     const result = await pool.query(
       `SELECT c.* FROM claims c
        JOIN patients p ON c.patient_id = p.patient_id
@@ -74,7 +65,7 @@ router.get('/insurer/:insurerId', verifyToken, async (req, res) => {
     );
     res.status(200).json(result.rows);
   } catch (err) {
-    console.error('Error fetching insurer claims:', err); // Added for better logging
+    console.error('Error fetching insurer claims:', err);
     res.status(500).json({ error: err.message });
   }
 });
