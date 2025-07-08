@@ -1,3 +1,9 @@
+const express = require('express');
+const router = express.Router();
+const { Pool } = require('pg');
+const verifyToken = require('../middleware/authMiddleware');
+require('dotenv').config();
+
 // Update staff role (hospital or insurer staff)
 router.put('/staff/:type/:id', verifyToken, async (req, res) => {
   if (req.user.role !== 'SystemAdmin') {
@@ -40,12 +46,6 @@ router.delete('/staff/:type/:id', verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-const express = require('express');
-const router = express.Router();
-const { Pool } = require('pg');
-const verifyToken = require('../middleware/authMiddleware');
-require('dotenv').config();
-
 
 // Get all staff (for User Roles management)
 router.get('/staff', verifyToken, async (req, res) => {
